@@ -1,0 +1,6 @@
+entity.vtcf_entity.add_form:
+  route_name: 'entity.vtcf_entity.add_form'
+  title: 'Add VTCF Entity'
+  appears_on:
+    - entity.vtcf_entity.collection
+

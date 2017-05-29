@@ -1,0 +1,14 @@
+{
+  "name": "drupal/vtcf",
+  "type": "drupal-module",
+  "description": "Provides ability for views to be filtered using checkboxed list of taxonomies.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/vtcf",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/vtcf",
+    "source": "http://cgit.drupalcode.org/vtcf"
+  },
+  "require": { }
+}

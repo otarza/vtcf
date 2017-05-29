@@ -1,0 +1,28 @@
+vtcf.vtcf_entity.*:
+  type: config_entity
+  label: 'VTCF Entity config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    view_name:
+      type: string
+      label: 'View Name'
+    view_display:
+      type: string
+      label: 'View Display'
+    taxonomy_vocabularies:
+      type: mapping
+      label: 'Taxonomy vocabularies'
+      mapping:
+        vid: integer
+    taxonomy_terms:
+      type: mapping
+      label: 'Taxonomy terms'
+      mapping:
+        tid: integer
+    uuid:
+      type: string

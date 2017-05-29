@@ -1,0 +1,9 @@
+
+# VTCF Entity menu items definition
+entity.vtcf_entity.collection:
+  title: 'VTCF Entity'
+  route_name: entity.vtcf_entity.collection
+  description: 'List VTCF Entity (bundles)'
+  parent: system.admin_structure
+  weight: 99
+
