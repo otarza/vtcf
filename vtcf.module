@@ -22,3 +22,17 @@ function vtcf_help($route_name, RouteMatchInterface $route_match) {
     default:
   }
 }
+
+/**
+ * Implements hook_views_data().
+ */
+function vtcf_views_data() {
+  $data['views']['taxonomy_filters_area'] = array(
+    'title' => t('Taxonomy Filters Area'),
+    'help' => t('Provide return link and a custom hardcoded text for my custom site.'),
+    'area' => array(
+      'id' => 'taxonomy_filters_area',
+    ),
+  );
+  return $data;
+}

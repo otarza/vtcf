@@ -1,0 +1,9 @@
+
+vtcf.taxonomy_filter_form:
+  path: '/vtcf/form/taxonomy_filter'
+  defaults:
+    _form: '\Drupal\vtcf\Form\TaxonomyFilterForm'
+    _title: 'TaxonomyFilterForm'
+  requirements:
+    _access: 'TRUE'
+  

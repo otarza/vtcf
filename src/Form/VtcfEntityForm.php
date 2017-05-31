@@ -41,7 +41,6 @@ class VtcfEntityForm extends EntityForm {
       '#disabled' => !$vtcf_entity->isNew(),
     ];
 
-
     $form['view_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('View name'),
@@ -60,7 +59,6 @@ class VtcfEntityForm extends EntityForm {
       '#required' => TRUE,
     ];
 
-
     $vocabularies = taxonomy_vocabulary_get_names();
     $form['taxonomy_vocabularies'] = [
       '#type' => 'checkboxes',
@@ -72,9 +70,12 @@ class VtcfEntityForm extends EntityForm {
     ];
 
     foreach ($vocabularies as $vid => $vocabulary) {
+
       $terms = \Drupal::service('entity_type.manager')
         ->getStorage("taxonomy_term")
         ->loadTree($vid);
+
+      $options = [];
       foreach ($terms as $tid => $term) {
         $options[$term->tid] = $term->name;
       }
@@ -91,10 +92,7 @@ class VtcfEntityForm extends EntityForm {
           ],
         ],
       ];
-
     }
-
-    dump($values);
 
     return $form;
   }
@@ -126,5 +124,4 @@ class VtcfEntityForm extends EntityForm {
     }
     $form_state->setRedirectUrl($vtcf_entity->toUrl('collection'));
   }
-
 }
