@@ -5,7 +5,11 @@
  * Contains vtcf.module.
  */
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_help().
@@ -23,16 +27,97 @@ function vtcf_help($route_name, RouteMatchInterface $route_match) {
   }
 }
 
+
 /**
- * Implements hook_views_data().
+ * Implements hook_form_alter().
+ *
+ * @param array $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  */
-function vtcf_views_data() {
-  $data['views']['taxonomy_filters_area'] = array(
-    'title' => t('Taxonomy Filters Area'),
-    'help' => t('Provide return link and a custom hardcoded text for my custom site.'),
-    'area' => array(
-      'id' => 'taxonomy_filters_area',
-    ),
-  );
-  return $data;
+function vtcf_form_alter(array &$form, FormStateInterface $form_state) {
+  $storage = $form_state->getStorage();
+  // Check if this is a views exposed filter form.
+  if (!empty($storage['view'])) {
+    $view = $storage['view'];
+    $view_id = $view->id();
+    $view_display = NULL;
+    if(property_exists($view, 'current_display')){
+      $view_display = $view->current_display;
+    }
+    $result = \Drupal::entityTypeManager()
+      ->getStorage('vtcf_entity')
+      ->loadByProperties([
+        'view_name' => $view_id,
+        'view_display' => $view_display,
+      ]);
+
+    // If there is vtcf config entity for this view, add checkboxes to the exposed filter form.
+    if (!empty($result)) {
+      /** @var \Drupal\vtcf\Entity\VtcfEntity $vtcf_entity */
+      $vtcf_entity = array_values($result)[0];
+      $values = $vtcf_entity->toArray();
+      $taxonomy_vocabularies_ids = array_filter($values['taxonomy_vocabularies']);
+      $taxonomy_terms_ids = array_filter($values['taxonomy_terms']);
+      $taxonomies_by_vocabularies = [];
+      /** @var Vocabulary[] $taxonomy_vocabularies */
+      $taxonomy_vocabularies = Vocabulary::loadMultiple($taxonomy_vocabularies_ids);
+      /** @var Term[] $terms */
+      $terms = Term::loadMultiple($taxonomy_terms_ids);
+      foreach ($terms as $term) {
+        $taxonomies_by_vocabularies[$term->getVocabularyId()][$term->id()] = $term;
+      }
+
+      foreach ($taxonomy_vocabularies as $vid => $taxonomy_vocabulary) {
+        $vocabulary_values = $taxonomy_vocabulary->toArray();
+        $options = [];
+        foreach ($taxonomies_by_vocabularies[$vid] as $tid => $term) {
+          $options[$tid] = $term->getName();
+        }
+        $form['taxonomies'][$vid] = [
+          '#type' => 'checkboxes',
+          '#title' => t($vocabulary_values['name']),
+          '#options' => $options,
+          '#weight' => 0,
+        ];
+      }
+    }
+  }
+}
+
+
+
+/**
+ * Implements hook_views_pre_build().
+ *
+ * @param \Drupal\views\ViewExecutable $view
+ */
+function vtcf_views_pre_build(ViewExecutable $view) {
+  $view_id = $view->id();
+  $view_display = $view->current_display;
+  $result = \Drupal::entityTypeManager()
+    ->getStorage('vtcf_entity')
+    ->loadByProperties([
+      'view_name' => $view_id,
+      'view_display' => $view_display,
+    ]);
+
+  // If there is vtcf config entity for this view, add arguments to it.
+  if (!empty($result)) {
+    /** @var \Drupal\vtcf\Entity\VtcfEntity $vtcf_entity */
+    $vtcf_entity = array_values($result)[0];
+    $values = $vtcf_entity->toArray();
+    $taxonomy_vocabularies = array_filter($values['taxonomy_vocabularies']);
+    $query_parameters = Drupal::request()->query->all();
+    if(!empty($query_parameters)) {
+      $args = [];
+      foreach ($taxonomy_vocabularies as $taxonomy_vocabulary) {
+        if(array_key_exists($taxonomy_vocabulary, $query_parameters)){
+          $args = array_merge($args, $query_parameters[$taxonomy_vocabulary]);
+        };
+      }
+      // Convert to '+' separated string to support OR instead of AND
+      $args = implode("+", $args);
+      $view->setArguments([$args]);
+    }
+  }
 }
