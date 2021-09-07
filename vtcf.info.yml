@@ -1,7 +1,7 @@
 name: Views taxonomy checkbox filters
 type: module
 description: Provides ability for views to be filtered using checkboxed list of taxonomies.
-core: 8.x
+core_version_requirement: ^8 || ^9
 package: Views
 dependencies:
   - views

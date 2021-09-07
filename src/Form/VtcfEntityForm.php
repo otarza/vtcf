@@ -112,13 +112,13 @@ class VtcfEntityForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label VTCF Entity.', [
+        \Drupal::messenger()->addMessage($this->t('Created the %label VTCF Entity.', [
           '%label' => $vtcf_entity->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label VTCF Entity.', [
+        \Drupal::messenger()->addMessage($this->t('Saved the %label VTCF Entity.', [
           '%label' => $vtcf_entity->label(),
         ]));
     }
